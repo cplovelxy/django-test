@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -27,16 +26,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
+    'django.contrib.sessions',  
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'share',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +53,7 @@ ROOT_URLCONF = 'share.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR + "/templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -69,35 +68,117 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'share.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',  # 或者使用 mysql.connector.django
+        'NAME': 'testtest',
+        'USER': 'root',
+        'PASSWORD': 'YOUxin@com',
+        'HOST': '10.210.110.117',
+        'PORT': '3306',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+LOG_PATH = os.path.join(BASE_DIR, 'log')
+# 如果地址不存在，则会自动创建log文件夹
+if not os.path.isdir(LOG_PATH): 
+    os.mkdir(LOG_PATH)
+
+LOGGING = {
+    # version 值只能为1
+    'version': 1,
+    # True 表示禁用loggers
+    'disable_existing_loggers': False,
+
+    # < 格式化 >
+    'formatters': {
+        # 可以设置多种格式，根据需要选择保存的格式
+        'default': {
+            'format': '%(levelname)s %(funcName)s %(module)s %(asctime)s %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(module)s %(asctime)s %(message)s'
+        }
+    },
+
+    # < 处理信息 >
+    'handlers': {
+        'stu_handlers': {
+            'level': 'DEBUG',
+            # 指定日志文件大小，若超过指定的文件大小，会再生成一个新的日志文件保存日志信息
+            'class': 'logging.handlers.RotatingFileHandler',
+            # 指定文件大小
+            # 1M=1024kb 1kb=1024b
+            'maxBytes': 5 * 1024 * 1024,
+            # 文件地址
+            'filename': '%s/log.txt' % LOG_PATH,
+            # 指定保存格式
+            'formatter': 'default'
+        },
+        'uauth_handlers': {
+            'level': 'DEBUG',
+            # 若日志超过指定文件的大小，会再生成一个新的日志文件保存日志信息
+            'class': 'logging.handlers.RotatingFileHandler',
+            # 指定文件大小
+            # 1M=1024kb 1kb=1024b
+            'maxBytes': 5 * 1024 * 1024,
+            # 文件地址
+            'filename': '%s/uauth_log.txt' % LOG_PATH,
+            # 指定保存格式
+            'formatter': 'simple'
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+
+
+    'loggers': {
+        'stu': {
+            'handlers': ['stu_handlers'],
+            'level': 'INFO'
+        },
+        'auth': {
+            'handlers': ['uauth_handlers'],
+            'level': 'INFO'
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+    },
+
+    'filters': {
+        
+    }
+}
 
 
 # Internationalization
@@ -112,7 +193,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/

@@ -16,8 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from share import view
+from share import model
 
 urlpatterns = [
     path('templates/index.html', admin.site.urls),
     path('hello/', view.hello),
+    path('hello1/', view.hello1),
+    path('testdb/', model.testdb),
 ]
